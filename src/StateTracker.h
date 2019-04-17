@@ -22,115 +22,44 @@ class StateTracker {
     }
 
     void move(Direction drc) {
-        switch (drc) {
-            case Direction::UP:
-                moveUp();
-                break;
-            case Direction::RIGHT:
-                moveRight();
-                break;
-            case Direction::DOWN:
-                moveDown();
-                break;
-            case Direction::LEFT:
-                moveLeft();
-                break;
-            default:
-                break;
+        int fix;
+        int init_curr = (drc==Direction::UP || drc==Direction::LEFT)?0:size-1;
+        int init_next = (drc==Direction::UP || drc==Direction::LEFT)?1:size-2;
+        int delta     = (drc==Direction::UP || drc==Direction::LEFT)?1:    -1;
+
+        int pcurr = init_curr;
+        int pnext = init_next;
+        int& p1   = (drc==Direction::UP || drc==Direction::LEFT)?pnext:pcurr;
+        int& p2   = (drc==Direction::UP || drc==Direction::LEFT)?pcurr:pnext;
+
+        int& row_curr = (drc==Direction::UP || drc==Direction::DOWN)?pcurr:fix;
+        int& row_next = (drc==Direction::UP || drc==Direction::DOWN)?pnext:fix;
+        int& col_curr = (drc==Direction::LEFT || drc==Direction::RIGHT)?pcurr:fix;
+        int& col_next = (drc==Direction::LEFT || drc==Direction::RIGHT)?pnext:fix;
+        
+        for (fix = 0; fix < size; ++fix) {
+            pcurr = init_curr;
+            pnext = init_next;
+            while (pnext < size && pnext >= 0) {
+                if (board[row_next][col_next] != 0) {
+                    if (board[row_curr][col_curr] == 0) {
+                        std::swap(board[row_next][col_next], board[row_curr][col_curr]);
+                    } else if (board[row_next][col_next] == board[row_curr][col_curr]) {
+                        board[row_curr][col_curr] += board[row_next][col_next];
+                        board[row_next][col_next] = 0;
+                        pcurr += delta;
+                    } else if (p1-p2>1) {
+                        pcurr += delta;
+                        continue;
+                    } else {
+                        pcurr = pnext;
+                    }
+                }
+                pnext += delta;
+            }
         }
+
         generateBlock();
-    }
-
-    void moveLeft() {
-        for (int row = 0; row < size; ++row) {
-            int pcurr = 0, pnext = 1;
-            while (pnext < size) {
-                if (board[row][pnext] != 0) {
-                    if (board[row][pcurr] == 0) {
-                        std::swap(board[row][pnext], board[row][pcurr]);
-                    } else if (board[row][pnext] == board[row][pcurr]) {
-                        board[row][pcurr] += board[row][pnext];
-                        board[row][pnext] = 0;
-                        ++pcurr;
-                    } else if (pcurr<pnext-1) {
-                        ++pcurr;
-                        continue;
-                    } else {
-                        pcurr = pnext;
-                    }
-                }
-                ++pnext;
-            }
-        }
-    }
-
-    void moveUp() {
-        for (int col = 0; col < size; ++col) {
-            int pcurr = 0, pnext = 1;
-            while (pnext < size) {
-                if (board[pnext][col] != 0) {
-                    if (board[pcurr][col] == 0) {
-                        std::swap(board[pnext][col], board[pcurr][col]);
-                    } else if (board[pnext][col] == board[pcurr][col]) {
-                        board[pcurr][col] += board[pnext][col];
-                        board[pnext][col] = 0;
-                        ++pcurr;
-                    } else if (pcurr<pnext-1) {
-                        ++pcurr;
-                        continue;
-                    } else {
-                        pcurr = pnext;
-                    }
-                }
-                ++pnext;
-            }
-        }
-    }
-
-    void moveRight() {
-        for (int row = 0; row < size; ++row) {
-            int pcurr = size - 1, pnext = size - 2;
-            while (pnext >= 0) {
-                if (board[row][pnext] != 0) {
-                    if (board[row][pcurr] == 0) {
-                        std::swap(board[row][pnext], board[row][pcurr]);
-                    } else if (board[row][pnext] == board[row][pcurr]) {
-                        board[row][pcurr] += board[row][pnext];
-                        board[row][pnext] = 0;
-                        --pcurr;
-                    } else if (pcurr>pnext+1) {
-                        --pcurr;
-                        continue;
-                    } else {
-                        pcurr = pnext;
-                    }
-                }
-                --pnext;
-            }
-        }
-    }
-
-    void moveDown() {
-        for (int col = 0; col < size; ++col) {
-            int pcurr = size - 1, pnext = size - 2;
-            while (pnext >= 0) {
-                if (board[pnext][col] != 0) {
-                    if (board[pcurr][col] == 0) {
-                        std::swap(board[pnext][col], board[pcurr][col]);
-                    } else if (board[pnext][col] == board[pcurr][col]) {
-                        board[pcurr][col] += board[pnext][col];
-                        board[pnext][col] = 0;
-                        --pcurr;
-                    } else if (pcurr>pnext+1) {
-                        --pcurr;
-                        continue;
-                    } else {
-                        pcurr = pnext;
-                    }
-                }
-                --pnext;
-            }
-        }
     }
 
     const std::vector<std::vector<int>>& getBoard() { return board; }
