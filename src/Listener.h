@@ -13,34 +13,42 @@ class Listener {
     static constexpr int DOWN = 80;
     static constexpr int LEFT = 75;
     static constexpr int RIGHT = 77;
+    StateTracker::Direction map[100];
 
    public:
-    Listener(StateTracker& t) : st(t) {}
+    Listener(StateTracker& t) : st(t) {
+        map[UP] = StateTracker::Direction::UP;
+        map[DOWN] = StateTracker::Direction::DOWN;
+        map[LEFT] = StateTracker::Direction::LEFT;
+        map[RIGHT] = StateTracker::Direction::RIGHT;
+    }
 
     void listen() {
         int c = 0;
         bool finished = false;
         while (!finished) {
             finished = true;
-            switch ((c = _getch())) {
-                case UP:
-                    st.move(StateTracker::Direction::UP);
-                    break;
-                case DOWN:
-                    st.move(StateTracker::Direction::DOWN);
-                    break;
-                case LEFT:
-                    st.move(StateTracker::Direction::LEFT);
-                    break;
-                case RIGHT:
-                    st.move(StateTracker::Direction::RIGHT);
-                    break;
-                case 'q':
-                    exit(0);
-                default:
-                    finished = false;
-                    break;
+            c = _getch();
+            if (c==UP||c==DOWN||c==LEFT||c==RIGHT) {
+                st.move(map[c]);
+            } else if (c=='q') {
+                exit(0);
+            } else {
+                finished = false;
             }
+            // switch ((c = _getch())) {
+            //     case UP:
+            //     case DOWN:
+            //     case LEFT:
+            //     case RIGHT:
+            //         st.move(map[c]);
+            //         break;
+            //     case 'q':
+            //         exit(0);
+            //     default:
+            //         finished = false;
+            //         break;
+            // }
         }
     }
 };
