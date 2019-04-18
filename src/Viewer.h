@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <iomanip>
 #include <iostream>
+#include <tuple>
 #include "StateTracker.h"
 
 class Viewer {
@@ -31,7 +32,7 @@ class Viewer {
     }
 
     void printFinal() {
-        auto [score, max_cell] = st.getStatistics();
+        auto max_cell = std::get<1>(st.getStatistics());
         std::cout << ((max_cell < 2048)
                           ? "*** You Failed! Try harder next time :) ***\n"
                           : "*** You Won! ***\n");
