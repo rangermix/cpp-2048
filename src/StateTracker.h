@@ -19,8 +19,11 @@ class StateTracker {
     std::unordered_set<std::tuple<int, int>, decltype(hash)> freeBlocks;
     std::default_random_engine rand_gen;
     int size;
+    bool closed = false;
+    int score = 0;
+    int max_cell = 0;
 
-    std::tuple<int, int> findEmpty() {
+    auto findEmpty() {
         if (freeBlocks.empty())
             return std::make_tuple(-1, -1);
 
@@ -40,9 +43,14 @@ class StateTracker {
     // TODO: add end of game
     void generateBlock() {
         auto [i, j] = findEmpty();
-        if (i == -1 && j == -1)
+        if (i == -1 && j == -1) {
+            closeGame();
             return;
-        update(i, j, 2);
+        }
+        std::uniform_int_distribution distribution(
+            0, 9);
+        int val = distribution(rand_gen);
+        update(i, j, val==9?4:2);
     }
 
     void update(int i, int j, int val) {
@@ -53,6 +61,8 @@ class StateTracker {
             freeBlocks.erase(std::make_tuple(i, j));
         }
     }
+
+    void closeGame() { closed = true; }
 
    public:
     enum Direction { UP, RIGHT, DOWN, LEFT };
@@ -104,9 +114,8 @@ class StateTracker {
             while (pnext < size && pnext >= 0) {
                 if (board[row_next][col_next] != 0) {
                     if (board[row_curr][col_curr] == 0) {
-                        int t = board[row_next][col_next];
-                        update(row_next, col_next, board[row_curr][col_curr]);
-                        update(row_curr, col_curr, t);
+                        update(row_curr, col_curr, board[row_next][col_next]);
+                        update(row_next, col_next, 0);
                         moved = true;
                     } else if (board[row_next][col_next] ==
                                board[row_curr][col_curr]) {
@@ -128,9 +137,23 @@ class StateTracker {
 
         if (moved)
             generateBlock();
+        else if (freeBlocks.empty())
+            closeGame();
     }
 
-    const std::vector<std::vector<int>>& getBoard() { return board; }
+    const auto& getBoard() { return board; }
+
+    const bool isClosed() { return closed; }
+
+    const auto getStatistics() {
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                score += board[i][j];
+                max_cell = std::max(max_cell, board[i][j]);
+            }
+        }
+        return std::make_tuple(score, max_cell);
+    }
 };
 
 #endif

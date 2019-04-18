@@ -29,6 +29,25 @@ class Viewer {
         // clrscr();
         // std::cout << "\033c";
     }
+
+    void printFinal() {
+        auto [score, max_cell] = st.getStatistics();
+        std::cout << ((max_cell < 2048)
+                          ? "*** You Failed! Try harder next time :) ***\n"
+                          : "*** You Won! ***\n");
+        printStatistics();
+    }
+
+    void printQuit() {
+        std::cout << "*** You Quit! ***\n";
+        printStatistics();
+    }
+
+    void printStatistics() {
+        auto [score, max_cell] = st.getStatistics();
+        std::cout << "You made a " << max_cell << " cell!\n";
+        std::cout << "Total score " << score << "\n";
+    }
 };
 
 #endif

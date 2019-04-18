@@ -23,7 +23,7 @@ class Listener {
         map[RIGHT] = StateTracker::Direction::RIGHT;
     }
 
-    void listen() {
+    bool listen() {
         int c = 0;
         bool finished = false;
         while (!finished) {
@@ -32,7 +32,7 @@ class Listener {
             if (c==UP||c==DOWN||c==LEFT||c==RIGHT) {
                 st.move(map[c]);
             } else if (c=='q') {
-                exit(0);
+                return false;
             } else {
                 finished = false;
             }
@@ -50,6 +50,7 @@ class Listener {
             //         break;
             // }
         }
+        return true;
     }
 };
 

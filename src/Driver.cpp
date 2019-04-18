@@ -9,7 +9,14 @@ int main(int argc, char const* argv[]) {
     while (1) {
         viewer.clearScreen();
         viewer.printBoard();
-        listener.listen();
+        if (st.isClosed()) {
+            viewer.printFinal();
+            break;
+        }
+        if (!listener.listen()) {
+            viewer.printQuit();
+            break;
+        }
     }
     return 0;
 }
